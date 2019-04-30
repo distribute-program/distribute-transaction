@@ -1,0 +1,4 @@
+server:
+  servlet:
+    context-path: /hand
+  port: 8002
