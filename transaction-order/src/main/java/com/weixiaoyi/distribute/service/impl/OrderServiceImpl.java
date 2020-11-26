@@ -8,6 +8,7 @@ import com.weixiaoyi.distribute.service.IOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
@@ -43,6 +44,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, MyOrder> implemen
 
     @Override
     public boolean handOut2(String orderId) {
+        //设置事务传播属性
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        // 设置事务的隔离级别,设置为读已提交（默认是ISOLATION_DEFAULT:使用的是底层数据库的默认的隔离级别）
+        transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
+        // 设置是否只读，默认是false
+        transactionTemplate.setReadOnly(true);
+        // 默认使用的是数据库底层的默认的事务的超时时间
+        transactionTemplate.setTimeout(30000);
+
         // 修改状态为 发货中
         transactionTemplate.execute(a -> {
             updateOrderStatus(orderId, 1);
